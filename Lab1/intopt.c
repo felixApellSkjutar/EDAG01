@@ -48,13 +48,13 @@ int printMatrix(double** matrix, int m, int n)
 		for(int j = 0; j < n ; j++) {
 			if(i == 0)
 			{
-				if(j == n-1)	printf("%lf\n\n", matrix[i][j]);
-				else 			printf("%lf + ", matrix[i][j]);
+				if(j == n-1)	printf("%10.3lf\n\n\t", matrix[i][j]);
+				else 			printf("%10.3lf + ", matrix[i][j]);
 			}
 			else if (i < m+1)
 			{
-				if (j == n-1) printf("%lf <= %lf\n",matrix[i][j], matrix[m+1][i-1]); 
-				else printf("%lf + ",matrix[i][j] );
+				if (j == n-1) printf("%10.3lf \u2264 %10.3lf\n\t",matrix[i][j], matrix[m+1][i-1]); 
+				else printf("%10.3lf + ",matrix[i][j] );
 			}
 			
 		}
