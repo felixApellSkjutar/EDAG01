@@ -1,7 +1,7 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 
-double** make_matrix(int m, int n);
+int make_matrix(int m, int n);
 int scanMatrix(double** matrix, int m, int n);
 int printMatrix(double** matrix, int m, int n);
 int main() 
@@ -11,13 +11,11 @@ int main()
 //	scanf("%d %d", &m, &n);
 //	printf("m: %d\nn: %d\n", m, n);
 	scanf("%d %d", &m, &n);
-	double** linearMatrix = make_matrix(m,n);
-	scanMatrix(linearMatrix, m, n);
-	printMatrix(linearMatrix, m, n);
+	make_matrix(m,n);
 	return 0;
 }
 
-double** make_matrix(int m, int n)
+int make_matrix(int m, int n)
 {
 	double** a;
 	int i;
@@ -25,7 +23,14 @@ double** make_matrix(int m, int n)
 	a = calloc(mm, sizeof(double*));
 	for (i = 0; i < mm; i += 1)
 		a[i] = calloc(n, sizeof(double));
-	return a;
+	
+	scanMatrix(a, m, n);
+	printMatrix(a, m, n);
+
+	for (i = 0; i < mm; i += 1)
+		free(a[i]);
+	free(a);
+	return 0;
 }
 
 int scanMatrix(double** matrix, int m, int n)
