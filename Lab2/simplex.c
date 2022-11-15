@@ -15,12 +15,34 @@ struct simplex_t
     double y;   /* y. */
 };
 
+int init(simplex_t *s, int m, int n, double** a, double* b, double* c, double* x, double y, int* var)
+{
+    int i, k;
+    s = (m,n,a,b,c,x,y,var);
+    if(s->var == NULL)
+    {
+        s->var = calloc(m+n+1, sizeof(int));
+        for(i = 0; i < m+n; i+=1)
+        {
+            s->var[i] = i;
+        }
+    }
+    for(k = 0, i = 1; i < m; i+=1)
+    {
+        if (b[i] < b[k])
+        {
+            k = i;
+        }
+    }
+    return k;
+}
+
 
 int initial(simplex_t *s, int m, int n, double **a, double *b, double* c, double *x, double y, int *var) 
 {
     int i, j, k;
     double w;
-    k = init(*s, m, n, **a, *b, *c, *x, y, *var);
+    k = init(s, m, n, a, b, c, x, y, var);
     if(b[k] >= 0) 
     {
         return 1;
