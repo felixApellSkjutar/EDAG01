@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -18,7 +19,14 @@ struct simplex_t
 int init(simplex_t *s, int m, int n, double** a, double* b, double* c, double* x, double y, int* var)
 {
     int i, k;
-    s = (m,n,a,b,c,x,y,var);
+    s->m = m;
+    s->n = n;
+    s->a = a;
+    s->b = b;
+    s->c = c;
+    s->x = x;
+    s->y = y;
+    s->var = var;
     if(s->var == NULL)
     {
         s->var = calloc(m+n+1, sizeof(int));
@@ -146,16 +154,16 @@ void pivot(simplex_t *s, int row, int col)
     a[row][col] = 1 / a[row][col];
 }
 
-int xsimplex(int m, int n, double **a, double *b, double* c, double *x, double y, int *var, int h)
+double xsimplex(int m, int n, double **a, double *b, double* c, double *x, double y, int *var, int h)
 {
     simplex_t *s;
     int i, row, col;
-    if (!initial(&s, m, n, a, b, c, x, y, var))
+    if (!initial(s, m, n, a, b, c, x, y, var))
     {
         free(s->var);
         return NAN;
     }
-    while ((col = select_nonbasic(&s)) >= 0)
+    while ((col = select_nonbasic(s)) >= 0)
     {
         row -= 1;
         int i;
@@ -171,7 +179,7 @@ int xsimplex(int m, int n, double **a, double *b, double* c, double *x, double y
             free(s->var);
             return INFINITY;
         }
-        pivot(&s, row, col);
+        pivot(s, row, col);
     }
     if (h == 0)
     {
@@ -205,7 +213,40 @@ int xsimplex(int m, int n, double **a, double *b, double* c, double *x, double y
     return s->y;
 }
 
-int simplex(int m, int n, double *a, double *b, double *c, double *x, double y)
+double simplex(int m, int n, double **a, double *b, double *c, double *x, double y)
 {
     return xsimplex(m, n, a, b, c, x, y, NULL, 0);
 }
+
+int main()
+{
+
+    int m, n;
+    double *c, *b, **a, **t, *x;
+    scanf("%d %d", &m, &n);
+    c = calloc(n, sizeof(double));
+    b = calloc(m, sizeof(double));
+    a = calloc(m, sizeof(double*)); //för att a är en matris
+    t = calloc(m+2, sizeof(double));//temp
+    x = calloc(m, sizeof(double));
+    int i;
+
+    for(i = 0; i < m+2; i++) {
+		for(int j = 0; j < n ; j++) {
+			scanf("%lf", &(t[i][j]));
+            if(i > 0 && i < m+1)
+            {
+                a[i-1][j] = t[i][j];
+            }
+		}
+	}
+    c = t[0];
+    b = t[m+1];
+
+    printf("%lf", simplex(m, n, a, b, c, x, 0));
+    return 0;
+}
+
+
+	
+	
