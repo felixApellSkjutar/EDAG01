@@ -38,6 +38,19 @@ int init(simplex_t *s, int m, int n, double** a, double* b, double* c, double* x
 }
 
 
+int select_nonbasic(simplex_t *s) 
+{
+    int i;
+    for(i = 0; i < s->m; i +=1) 
+    {
+        if(s->c[i] > pow(10, -6))
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 int initial(simplex_t *s, int m, int n, double **a, double *b, double* c, double *x, double y, int *var) 
 {
     int i, j, k;
