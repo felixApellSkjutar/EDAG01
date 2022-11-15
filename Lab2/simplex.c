@@ -16,7 +16,7 @@ struct simplex_t {
 }; 
 
 
-int xsimplex(int m, int n, double* a, double* b, double c, double x, double y, int* var, int h)
+int xsimplex(int m, int n, double* a, double* b, double c, double* x, double y, int* var, int h)
 {
     simplex_t* s;
     int i, row, col;
@@ -42,9 +42,37 @@ int xsimplex(int m, int n, double* a, double* b, double c, double x, double y, i
         }
         pivot(&s, row, col);
     }
-
+    if (h == 0) 
+    {
+        for(i = 0; i < n; i +=1)
+        {
+            if(s -> var[i] < n)
+            {
+                x[s->var[i]] = 0;
+            }
+        }
+        for(i = 0; i < n; i +=1)
+        {
+            if(s->var[n+i] < n)
+            {
+                x[s->var[n+i]] = s->b[i];
+            }
+        }
+        free(s->var);
+    }
+    else{
+        for(i = 0; i < n; i +=1)
+        {
+            x[i] = 0;
+        }
+        for(i = n; i < n + m; i += 1)
+        {
+            x[i] = s->b[i-n];
+        }
+    }
+    return s->y;
 }
 
-int simplex(int m, int n, double* a, double* b, double c, double x, double y) {
+int simplex(int m, int n, double* a, double* b, double c, double* x, double y) {
     return xsimplex(m, n, a, b, c, x, y, NULL, 0);
 }
