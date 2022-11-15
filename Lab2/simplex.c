@@ -3,6 +3,7 @@
 #include <math.h>
 
 typedef struct simplex_t simplex_t;
+double epsilon = 0.0000001;
 
 struct simplex_t
 {
@@ -29,7 +30,7 @@ int init(simplex_t *s, int m, int n, double** a, double* b, double* c, double* x
     s->var = var;
     if(s->var == NULL)
     {
-        s->var = calloc(m+n+1, sizeof(int));
+        s->var = calloc(m+n+1, sizeof(int)); //Kanske fel
         for(i = 0; i < m+n; i+=1)
         {
             s->var[i] = i;
@@ -49,9 +50,9 @@ int init(simplex_t *s, int m, int n, double** a, double* b, double* c, double* x
 int select_nonbasic(simplex_t *s) 
 {
     int i;
-    for(i = 0; i < s->m; i +=1) 
+    for(i = 0; i < s->n; i +=1) 
     {
-        if(s->c[i] > pow(10, -6))
+        if(s->c[i] > epsilon)
         {
             return i;
         }
@@ -106,7 +107,7 @@ void pivot(simplex_t *s, int row, int col)
     t = s->var[col];
     s->var[col] = s->var[n + row];
     s->var[n + row] = t;
-    s->y = s->y + c[col] * b[row] / a[row][col];
+    s->y = s->y + (c[col] * b[row] / a[row][col]);
 
     for (i = 0; i < n; i += 1)
     {
@@ -156,48 +157,47 @@ void pivot(simplex_t *s, int row, int col)
 
 double xsimplex(int m, int n, double **a, double *b, double* c, double *x, double y, int *var, int h)
 {
-    simplex_t *s;
+    simplex_t s;
     int i, row, col;
-    if (!initial(s, m, n, a, b, c, x, y, var))
+    if (!initial(&s, m, n, a, b, c, x, y, var))
     {
-        free(s->var);
+        free(s.var);
         return NAN;
     }
-    while ((col = select_nonbasic(s)) >= 0)
+    while ((col = select_nonbasic(&s)) >= 0)
     {
-        row -= 1;
-        int i;
+        row = -1;
         for (i = 0; i < m; i += 1)
         {
-            if (a[i][col] > pow(10, -6) && (row < 0 || b[i] / a[i][col] < b[row] / a[row][col]))
+            if (a[i][col] > epsilon && (row < 0 || b[i] / a[i][col] < b[row] / a[row][col]))
             {
                 row = i;
             }
         }
         if (row < 0)
         {
-            free(s->var);
+            free(s.var);
             return INFINITY;
         }
-        pivot(s, row, col);
+        pivot(&s, row, col);
     }
     if (h == 0)
     {
         for (i = 0; i < n; i += 1)
         {
-            if (s->var[i] < n)
+            if (s.var[i] < n)
             {
-                x[s->var[i]] = 0;
+                x[s.var[i]] = 0;
             }
         }
-        for (i = 0; i < n; i += 1)
+        for (i = 0; i < m; i += 1)
         {
-            if (s->var[n + i] < n)
+            if (s.var[n + i] < n)
             {
-                x[s->var[n + i]] = s->b[i];
+                x[s.var[n + i]] = s.b[i];
             }
         }
-        free(s->var);
+        free(s.var);
     }
     else
     {
@@ -207,10 +207,10 @@ double xsimplex(int m, int n, double **a, double *b, double* c, double *x, doubl
         }
         for (i = n; i < n + m; i += 1)
         {
-            x[i] = s->b[i - n];
+            x[i] = s.b[i - n];
         }
     }
-    return s->y;
+    return s.y;
 }
 
 double simplex(int m, int n, double **a, double *b, double *c, double *x, double y)
@@ -227,12 +227,17 @@ int main()
     c = calloc(n, sizeof(double));
     b = calloc(m, sizeof(double));
     a = calloc(m, sizeof(double*)); //för att a är en matris
-    t = calloc(m+2, sizeof(double));//temp
+    t = calloc(m+2, sizeof(double*));//temp
     x = calloc(m, sizeof(double));
     int i;
 
-    for(i = 0; i < m+2; i++) {
-		for(int j = 0; j < n ; j++) {
+    for(i = 0; i < m; i+=1) 
+    {
+        a[i] = calloc(n, sizeof(double));
+    }
+    for(i = 0; i < m+2; i+=1) {
+        t[i] = calloc(n, sizeof(double));
+		for(int j = 0; j < n ; j+=1) {
 			scanf("%lf", &(t[i][j]));
             if(i > 0 && i < m+1)
             {
