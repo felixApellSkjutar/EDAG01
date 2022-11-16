@@ -4,6 +4,7 @@
 
 typedef struct simplex_t simplex_t;
 double epsilon = 0.0000001;
+int glob;
 
 struct simplex_t
 {
@@ -248,7 +249,22 @@ int main()
     c = t[0];
     b = t[m+1];
 
+    for(i = 0; i < m; i +=1)
+    {
+        free(a[i]);
+    }
+
+    for(i = 0; i < m+2; i += 1) 
+    {
+        free(t[i]);
+    }
+
     printf("%lf", simplex(m, n, a, b, c, x, 0));
+    free(c);
+    free(b);
+    free(a);
+    free(t);
+    free(x);
     return 0;
 }
 
