@@ -249,19 +249,20 @@ int main()
     c = t[0];
     b = t[m+1];
 
+    printf("%lf", simplex(m, n, a, b, c, x, 0));
+
     for(i = 0; i < m; i +=1)
     {
-        free(a[i]);
+        free(a[i]);     //invalid free()
     }
 
-    for(i = 0; i < m+2; i += 1) 
+    for(i = 0; i < m + 2; i += 1) 
     {
-        free(t[i]);
+        //free(t[i]);
     }
 
-    printf("%lf", simplex(m, n, a, b, c, x, 0));
     free(c);
-    free(b);
+    free(b);    //invalid free()
     free(a);
     free(t);
     free(x);
