@@ -225,12 +225,13 @@ int main()
     int m, n;
     double *c, *b, **a, **t, *x;
     scanf("%d %d", &m, &n);
-    c = calloc(n, sizeof(double));
-    b = calloc(m, sizeof(double));
+    //c = calloc(n, sizeof(double));
+    //b = calloc(m, sizeof(double));
     a = calloc(m, sizeof(double*)); //för att a är en matris
     t = calloc(m+2, sizeof(double*));//temp
     x = calloc(m, sizeof(double));
     int i;
+
 
     for(i = 0; i < m; i+=1) 
     {
@@ -258,11 +259,11 @@ int main()
 
     for(i = 0; i < m + 2; i += 1) 
     {
-        //free(t[i]);
+        free(t[i]);
     }
 
-    free(c);
-    free(b);    //invalid free()
+//    free(c);
+//    free(b);    //invalid free()
     free(a);
     free(t);
     free(x);
