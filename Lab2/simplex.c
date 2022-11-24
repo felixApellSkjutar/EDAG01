@@ -5,6 +5,8 @@
 typedef struct simplex_t simplex_t;
 double epsilon = 0.0000001;
 int glob;
+int	global_local_array[10];
+
 
 struct simplex_t
 {
@@ -222,6 +224,8 @@ double simplex(int m, int n, double **a, double *b, double *c, double *x, double
 int main()
 {
 
+
+
     int m, n;
     double *c, *b, **a, **t, *x;
     scanf("%d %d", &m, &n);
@@ -231,11 +235,21 @@ int main()
     t = calloc(m+2, sizeof(double*));//temp
     x = calloc(m, sizeof(double));
     int i;
+    int local_array[10];
+    for (i = 0; i < 11; i += 1)
+	    local_array[i] = i;
+    /***STACK SMASHING DETECTED****/
+    //Valgrind säger ingenting alls när det handlar om globala variabler.
 
+//Google sanitizer varnar för WRITE of size 4 at ...
+//Vid global allokering.
+
+//ocal: 
+// stack-buffer-overflow on address
 
     for(i = 0; i < m; i+=1) 
     {
-        a[i] = calloc(n, sizeof(double));
+        a[i] = calloc(n, sizeof(double));   
     }
     for(i = 0; i < m+2; i+=1) {
         t[i] = calloc(n, sizeof(double));
