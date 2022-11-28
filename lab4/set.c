@@ -3,25 +3,29 @@
 
 struct node_t {
     int m;
-    int n;
-    int k;
-    int h ;
-    double xh;
-    double ak;
-    double bk;
-    double *min;
-    double *max;
-    double **a;
-    double *b;
-    double *x;
-    double *c;
-    double z;
 };
 
 struct Node{
-    int data;
+    struct node_t *t;
     struct Node *next;
 };
+
+void deleteElem(struct Node** head, struct node_t *elem)
+{
+    struct Node* temp = *head;
+    struct Node* prev = *head;
+
+
+    while(temp != NULL) {
+        if((temp->t) == elem) {
+            prev->next = temp->next;
+            printf("vi kanske gjorde det idk");
+            return; //Duplicate, no put in plz
+        }
+        prev = temp;
+        temp = temp->next;
+    } 
+}
 
 void deleteStart(struct Node** head){
     struct Node* temp = *head;
@@ -34,31 +38,40 @@ void deleteStart(struct Node** head){
     
     // move head to next node
     *head = (*head)->next;
-    printf("Deleted: %d\n", temp->data);
+    printf("Deleted: %d\n", (temp->t)->m);
     free(temp);
 }
 
-void insertStart(struct Node** head, int data){
+void insertStart(struct Node** head, struct node_t *data){
+    struct Node* temp = *head;
+
+    while(temp != NULL) {
+        if((temp->t) == data) {
+            printf("Duplicate, can't add to Set");
+            return; //Duplicate, no put in plz
+        }
+        temp = temp->next;
+    }
     
     // dynamically create memory for this newNode
     struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
     
     // assign data value
-    newNode->data = data;
+    newNode->t = data;
     // change the next node of this newNode 
     // to current head of Linked List
     newNode->next = *head;
 
     //re-assign head to this newNode
     *head = newNode;
-    printf("Inserted %d\n",newNode->data);
+    printf("Inserted %d\n",(newNode->t)->m);
 }
 
 void display(struct Node* node){
     printf("\nLinked List: ");
     // as linked list will end when Node is Null
     while(node!=NULL){
-        printf("%d ",node->data);
+        printf("%d ",(node->t)->m);
         node = node->next;
     }
     printf("\n");
@@ -69,18 +82,21 @@ int main()
     struct Node* head = NULL;
 
     // Need '&' i.e. address as we need to change head
-    insertStart(&head,100);
-    insertStart(&head,80);
-    insertStart(&head,60);
-    insertStart(&head,40);
-    insertStart(&head,20);
-    
+    struct node_t t;
+    t.m = 10;
+    struct node_t s;
+    s.m = 100;
+    insertStart(&head,&t);
+    insertStart(&head,&s);
+    insertStart(&head,&s);
+    deleteElem(&head, &s);
+
     // No Need for '&' as not changing head in display operation
     display(head);
     
     deleteStart(&head);
-    deleteStart(&head);
-    display(head);
+    //deleteStart(&head);
+    //display(head);
     
     return 0; 
 }
