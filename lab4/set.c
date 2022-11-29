@@ -12,19 +12,28 @@ struct Node{
 
 void deleteElem(struct Node** head, struct node_t *elem)
 {
+    if(*head == NULL) {
+        return;
+    } else if((*head)->t ==  elem){
+        *head = (*head)->next;
+        return;
+    }
+    struct Node* prev = (*head)->next;
     struct Node* temp = *head;
-    struct Node* prev = *head;
-
-
     while(temp != NULL) {
         if((temp->t) == elem) {
             prev->next = temp->next;
-            printf("vi kanske gjorde det idk");
+            printf("vi kanske gjorde det idk\n");
+            free(prev);
+            free(temp);
             return; //Duplicate, no put in plz
         }
         prev = temp;
         temp = temp->next;
-    } 
+    }
+    free(prev);
+    free(temp);
+    return;
 }
 
 void deleteStart(struct Node** head){
@@ -86,15 +95,20 @@ int main()
     t.m = 10;
     struct node_t s;
     s.m = 100;
+    struct node_t a;
+    a.m = 200;
     insertStart(&head,&t);
     insertStart(&head,&s);
-    insertStart(&head,&s);
     deleteElem(&head, &s);
+    insertStart(&head,&a);
+    deleteElem(&head, &a);
+    deleteElem(&head, &t);
+
 
     // No Need for '&' as not changing head in display operation
     display(head);
     
-    deleteStart(&head);
+    //deleteStart(&head);
     //deleteStart(&head);
     //display(head);
     
