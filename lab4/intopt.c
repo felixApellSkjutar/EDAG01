@@ -139,91 +139,7 @@ int init(struct simplex_t *s, int m, int n, double **a, double *b, double *c, do
 void prepare(struct simplex_t *s, int k);
 int select_nonbasic(struct simplex_t *s);
 
-int main(int argc, char **args)
-{
-    int m, n;
-    double *c, *b;
-    double **a;
 
-    scanf("%d %d", &m, &n);
-
-    c = calloc(n, sizeof(double));
-    b = calloc(m, sizeof(double));
-    a = calloc(m, sizeof(double *));
-
-    for (int i = 0; i < n; i++)
-    {
-        scanf("%lf", &c[i]);
-    }
-
-    for (int i = 0; i < m; i++)
-    {
-        a[i] = calloc(n + 1, sizeof(double));
-
-        for (int x = 0; x < n; x++)
-        {
-            scanf("%lf", &a[i][x]);
-        }
-    }
-
-    for (int i = 0; i < m; i++)
-    {
-        scanf("%lf", &b[i]);
-    }
-
-    printf("m = %d, n = %d\n", m, n);
-    printf("max z = ");
-    for (int i = 0; i < n; i++)
-    {
-        printf("%10.3lf", c[i]);
-        if (i < n - 1)
-        {
-            printf(" + ");
-        }
-        else
-        {
-            printf("\n");
-        }
-    }
-
-    double *xvalues = calloc(n + m + 1, sizeof(double));
-
-    for (int y = 0; y < m; y++)
-    {
-        printf("        ");
-        xvalues[y] = 0.0;
-        for (int x = 0; x < n; x++)
-        {
-            xvalues[y] += a[y][x];
-            printf("%10.3lf", a[y][x]);
-            if (x < n - 1)
-            {
-                printf(" + ");
-            }
-            else
-            {
-                printf(" \u2264 %lf", b[y]);
-            }
-        }
-        printf("\n");
-    }
-
-    printf("\n");
-
-    double result = simplex(m, n, a, b, c, xvalues, 0.0);
-    free(c);
-    free(b);
-    for (int i = 0; i < m; i++)
-    {
-        free(a[i]);
-    }
-    free(a);
-    free(xvalues);
-
-    printf("Result: %lf\n", result);
-
-    return 0;
-}
 
 void print_simplex(struct simplex_t *s)
 {
@@ -799,4 +715,91 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
     } else {
         return z;
     }
+}
+
+int main(int argc, char **args)
+{
+    int m, n;
+    double *c, *b;
+    double **a;
+
+    scanf("%d %d", &m, &n);
+
+    c = calloc(n, sizeof(double));
+    b = calloc(m, sizeof(double));
+    a = calloc(m, sizeof(double *));
+
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%lf", &c[i]);
+    }
+
+    for (int i = 0; i < m; i++)
+    {
+        a[i] = calloc(n + 1, sizeof(double));
+
+        for (int x = 0; x < n; x++)
+        {
+            scanf("%lf", &a[i][x]);
+        }
+    }
+
+    for (int i = 0; i < m; i++)
+    {
+        scanf("%lf", &b[i]);
+    }
+
+    printf("m = %d, n = %d\n", m, n);
+    printf("max z = ");
+    for (int i = 0; i < n; i++)
+    {
+        printf("%10.3lf", c[i]);
+        if (i < n - 1)
+        {
+            printf(" + ");
+        }
+        else
+        {
+            printf("\n");
+        }
+    }
+
+    double *xvalues = calloc(n + m + 1, sizeof(double));
+
+    for (int y = 0; y < m; y++)
+    {
+        printf("        ");
+        xvalues[y] = 0.0;
+        for (int x = 0; x < n; x++)
+        {
+            xvalues[y] += a[y][x];
+            printf("%10.3lf", a[y][x]);
+            if (x < n - 1)
+            {
+                printf(" + ");
+            }
+            else
+            {
+                printf(" \u2264 %lf", b[y]);
+            }
+        }
+        printf("\n");
+    }
+
+    printf("\n");
+
+//    double result = simplex(m, n, a, b, c, xvalues, 0.0);
+    double result = intopt(m, n, a, b, c, xvalues);
+    free(c);
+    free(b);
+    for (int i = 0; i < m; i++)
+    {
+        free(a[i]);
+    }
+    free(a);
+    free(xvalues);
+
+    printf("Result: %lf\n", result);
+
+    return 0;
 }
