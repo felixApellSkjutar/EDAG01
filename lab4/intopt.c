@@ -117,6 +117,7 @@ void insertStart(struct Node **head, struct node_t *data)
     // re-assign head to this newNode
     *head = newNode;
     printf("Inserted %d\n", (newNode->t)->m);
+    free(newNode);
 }
 
 void display(struct Node *node)
@@ -482,16 +483,16 @@ struct node_t* initial_node(int m, int n, double **a, double *b, double *c)
 {
     struct node_t *p = calloc(1 , sizeof(struct node_t));
 
-    p->a = calloc(m + 1, sizeof(double*));
+    p->a = calloc(m + 1, sizeof(double*));          //behöver free()
     for (int i = 0; i < m + 1; i++)
     {
-        p->a[i] = calloc(n + 1, sizeof(double));
+        p->a[i] = calloc(n + 1, sizeof(double));    //behöver free()
     }
-    p->b = calloc(m + 1, sizeof(double));
-    p->c = calloc(n + 1, sizeof(double));
-    p->x = calloc(n + 1, sizeof(double));
-    p->min = calloc(n, sizeof(double));
-    p->max = calloc(n, sizeof(double));
+    p->b = calloc(m + 1, sizeof(double));       //behöver free()
+    p->c = calloc(n + 1, sizeof(double));       //behöver free()
+    p->x = calloc(n + 1, sizeof(double));       //behöver free()
+    p->min = calloc(n, sizeof(double));         //behöver free()
+    p->max = calloc(n, sizeof(double));         //behöver free()
     p->m = m;
     p->n = n;
     //memcpy(p->a, &a, sizeof(double*) * (m + 1));
@@ -697,7 +698,7 @@ void succ(struct node_t *p, struct Node **h, int m, int n, double **a, double *b
 double intopt(int m, int n, double **a, double *b, double *c, double *x)
 {
     struct node_t *p = initial_node(m, n, a, b, c);
-    struct Node **h = calloc(m, sizeof(struct node_t));
+    struct Node **h = calloc(m, sizeof(struct node_t));     //behöver free()
     insertStart(h, p);
     double z = -INFINITY;
     p->z = simplex(p->m, p->n, p->a, p->b, p->c, p->x, 0);
@@ -706,7 +707,19 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
         if(integer(p)) {
             memcpy(x, p->x, sizeof(double*) * p->n);
         }
+
+         for (int i = 0; i < m + 1; i++)
+        {
+            free(p->a[i]);
+        }
+        free(p->a);
+        free(p->b);
+        free(p->c);
+        free(p->x);
+        free(p->min);
+        free(p->max);
         free(p);
+        free(h);
         return z;
     }
     branch(p, z);
