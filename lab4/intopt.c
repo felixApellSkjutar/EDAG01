@@ -480,8 +480,9 @@ void pivot(struct simplex_t *s, int row, int col)
 
 struct node_t* initial_node(int m, int n, double **a, double *b, double *c)
 {
-    struct node_t *p;
-    p->a = calloc(m + 1, sizeof(double *));
+    struct node_t *p = calloc(1 , sizeof(struct node_t));
+
+    p->a = calloc(m + 1, sizeof(double*));
     for (int i = 0; i < m + 1; i++)
     {
         p->a[i] = calloc(n + 1, sizeof(double));
@@ -493,9 +494,14 @@ struct node_t* initial_node(int m, int n, double **a, double *b, double *c)
     p->max = calloc(n, sizeof(double));
     p->m = m;
     p->n = n;
-    memcpy(p->a, &a, sizeof(double**) * (m + 1));
-    memcpy(p->b, &b, sizeof(double*) * (m + 1));
-    memcpy(p->c, &c, sizeof(double*) * (n + 1));
+    //memcpy(p->a, &a, sizeof(double*) * (m + 1));
+    for(int i = 0; i  < m; i+=1) {
+        for (int j = 0; j < n; j+=1) {
+            p->a[i][j] = a[i][j];
+        }
+    }
+    memcpy(p->b, b, sizeof(double) * m);
+    memcpy(p->c, c, sizeof(double) * n);
 
     for (int i = 0; i < n; i++)
     {
@@ -691,14 +697,14 @@ void succ(struct node_t *p, struct Node **h, int m, int n, double **a, double *b
 double intopt(int m, int n, double **a, double *b, double *c, double *x)
 {
     struct node_t *p = initial_node(m, n, a, b, c);
-    struct Node **h;
+    struct Node **h = calloc(m, sizeof(struct node_t));
     insertStart(h, p);
     double z = -INFINITY;
     p->z = simplex(p->m, p->n, p->a, p->b, p->c, p->x, 0);
     if(integer(p) || !isfinite(p->z)) {
         z = p->z;
         if(integer(p)) {
-            memcpy(x, p->x, sizeof(double*) * (m + n));
+            memcpy(x, p->x, sizeof(double*) * p->n);
         }
         free(p);
         return z;
@@ -711,8 +717,10 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
         free(temp);
     }
     if(z == -INFINITY) {
+        free(h);
         return NAN;
     } else {
+        free(h);
         return z;
     }
 }
