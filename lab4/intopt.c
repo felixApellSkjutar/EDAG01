@@ -772,5 +772,10 @@ void succ(struct node_t *p, struct Node *h, int m, int n, double **a, double *b,
 void intopt(int m, int n, double **a, double *b, double *c, double x)
 {
     struct node_t *p = initial_node(m, n, a, b, c);
-    struct Node *h 
+    struct Node *h;
+    insertStart(h, p);
+    
+    double z = -INFINITY;
+    p->z = simplex(p->m, p->n, p->a, p->b, p->c, p->x, 0);
+    if()
 }
