@@ -774,8 +774,26 @@ void intopt(int m, int n, double **a, double *b, double *c, double x)
     struct node_t *p = initial_node(m, n, a, b, c);
     struct Node *h;
     insertStart(h, p);
-    
     double z = -INFINITY;
     p->z = simplex(p->m, p->n, p->a, p->b, p->c, p->x, 0);
-    if()
+    if(integer(p) || !isfinite(p->z)) {
+        z = p->z;
+        if(integer(p)) {
+            memcpy(x, p->x, m + n);
+        }
+        free(p);
+        return z;
+    }
+    branch(p, z);
+    while(h != NULL) {
+        struct node_t *temp = h->t;
+        succ(temp, h, m, n, a, b, c, temp->h, 1, floor(temp->xh), &z, x); 
+        succ(temp, h, m, n, a, b, c, temp->h, -1, -ceil(temp->xh), &z, x); 
+        free(temp);
+    }
+    if(z == -INFINITY) {
+        return NAN;
+    } else {
+        return z;
+    }
 }
