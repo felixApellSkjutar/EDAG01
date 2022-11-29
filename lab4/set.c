@@ -18,8 +18,8 @@ void deleteElem(struct Node** head, struct node_t *elem)
         *head = (*head)->next;
         return;
     }
-    struct Node* prev = (*head)->next;
-    struct Node* temp = *head;
+    struct Node* prev = (*head);
+    struct Node* temp = (*head)->next;
     while(temp != NULL) {
         if((temp->t) == elem) {
             prev->next = temp->next;
