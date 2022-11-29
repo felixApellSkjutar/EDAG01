@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <math.h>
+#include <string.h>
+
 #define EPSILON 0.000001
 
 struct simplex_t
@@ -574,9 +577,9 @@ struct node_t* initial_node(int m, int n, double **a, double *b, double *c)
     p->max = calloc(n, sizeof(double));
     p->m = m;
     p->n = n;
-    memcpy(p->a, &a, m + 1);
-    memcpy(p->b, &b, m + 1);
-    memcpy(p->c, &c, n + 1);
+    memcpy(p->a, &a, sizeof(double**) * (m + 1));
+    memcpy(p->b, &b, sizeof(double*) * (m + 1));
+    memcpy(p->c, &c, sizeof(double*) * (n + 1));
 
     for (int i = 0; i < n; i++)
     {
@@ -615,11 +618,11 @@ struct node_t* extend(struct node_t *p, int m, int n, double **a, double *b, dou
     q->x = calloc(q->n + 1, sizeof(double));
     q->min = calloc(n, sizeof(double));
     q->max = calloc(n, sizeof(double));
-    memcpy(q->min, p->min, n);
-    memcpy(q->max, p->max, n);
-    memcpy(q->a, &a, m);
-    memcpy(q->b, &b, m);
-    memcpy(q->c, &c, n + 1);
+    memcpy(q->min, p->min, sizeof(double*) * n);
+    memcpy(q->max, p->max, sizeof(double*) *n);
+    memcpy(q->a, &a, sizeof(double**) * m);
+    memcpy(q->b, &b, sizeof(double*) * m);
+    memcpy(q->c, &c, sizeof(double*) * (n + 1));
     if (ak > 0)
     {
         if (q->max[k] == INFINITY || bk < q->max[k])
@@ -653,7 +656,7 @@ struct node_t* extend(struct node_t *p, int m, int n, double **a, double *b, dou
 int is_integer(double *xp)
 {
     double x = *xp;
-    double r = round(x);
+    double r = lround(x);
     if (fabs(r - x) < EPSILON)
     {
         *xp = r;
@@ -678,16 +681,16 @@ int integer(struct node_t *p)
     return 1;
 }
 
-void bound(struct node_t *p, struct Node *h, double *zp, double *x)
+void bound(struct node_t *p, struct Node **h, double *zp, double *x)
 {
     if (&(p->z) > zp)
     {
         zp = &(p->z);
-        memcpy(x, &(p->x), p->n);
+        memcpy(x, &(p->x), sizeof(int) *p->n);
         // remove all nodes q in h with q.z < p.z
 
-        struct Node *prev = (h);
-        struct Node *temp = (h)->next;
+        struct Node *prev = (*h);
+        struct Node *temp = (*h)->next;
         while (temp != NULL)
         {
             if ((temp->t->z) < p->z)
@@ -747,7 +750,7 @@ bool branch(struct node_t *q, double z)
 }
 
 
-void succ(struct node_t *p, struct Node *h, int m, int n, double **a, double *b, double *c, int k, double ak, double bk, int *zp, int x)
+void succ(struct node_t *p, struct Node **h, int m, int n, double **a, double *b, double *c, int k, double ak, double bk, double *zp, double *x)
 {
     struct node_t *q = extend(p, m, n, a, b, c, k, ak, bk); 
     if(q == NULL)
@@ -755,11 +758,11 @@ void succ(struct node_t *p, struct Node *h, int m, int n, double **a, double *b,
         return;
     }
     q->z = simplex(q->m, q->n, q->a, q->b, q->c, q->x,0);
-    if(isFinite(q->z))
+    if(isfinite(q->z))
     {
         if(integer(q)) 
         {
-            bound(q, h, zp,x);
+            bound(q, h, zp, x);
         } else if(branch(q, *zp)) {
             insertStart(h, q);
             return;
@@ -769,24 +772,24 @@ void succ(struct node_t *p, struct Node *h, int m, int n, double **a, double *b,
 }
 
 
-void intopt(int m, int n, double **a, double *b, double *c, double x)
+double intopt(int m, int n, double **a, double *b, double *c, double *x)
 {
     struct node_t *p = initial_node(m, n, a, b, c);
-    struct Node *h;
+    struct Node **h;
     insertStart(h, p);
     double z = -INFINITY;
     p->z = simplex(p->m, p->n, p->a, p->b, p->c, p->x, 0);
     if(integer(p) || !isfinite(p->z)) {
         z = p->z;
         if(integer(p)) {
-            memcpy(x, p->x, m + n);
+            memcpy(x, p->x, sizeof(double*) * (m + n));
         }
         free(p);
         return z;
     }
     branch(p, z);
     while(h != NULL) {
-        struct node_t *temp = h->t;
+        struct node_t *temp = (*h)->t;
         succ(temp, h, m, n, a, b, c, temp->h, 1, floor(temp->xh), &z, x); 
         succ(temp, h, m, n, a, b, c, temp->h, -1, -ceil(temp->xh), &z, x); 
         free(temp);
