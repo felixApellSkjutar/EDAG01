@@ -6,6 +6,7 @@
 #include <string.h>
 
 #define EPSILON 0.000001
+int glob = 0;
 
 struct simplex_t
 {
@@ -93,9 +94,6 @@ void deleteStart(struct Node *head)
 struct node_t pop(struct Node *head)
 {
     struct Node *temp = head;
-
-    // If head is NULL it means Singly Linked List is empty
-    if (head == NULL)
 
     // move head to next node
     head = (head)->next;
@@ -530,8 +528,12 @@ struct node_t* extend(struct node_t *p, int m, int n, double **a, double *b, dou
     q->k = k;
     q->ak = ak;
     q->bk = bk;
-    if (ak > 0 && p->max[k] < INFINITY)
+    glob += 1;
+    //Den kraschar för k är för stort för lilla max[]
+    printf("MAX K BITCHES: %lf\n", p->max[k]);
+    if (ak > 0 && p->max[k] < INFINITY){
         q->m = p->m;
+    }
     else if (ak < 0 && p->min[k] > 0)
     {
         q->m = p->m;
@@ -634,10 +636,13 @@ int integer(struct node_t *p)
 
 void bound(struct node_t *p, struct Node *h, double *zp, double *x)
 {
-    if (&(p->z) > zp)
+    if (p->z > *zp)
     {
-        zp = &(p->z);
-        memcpy(x, &(p->x), sizeof(int) *p->n);
+        *zp = p->z;
+        memcpy(x, p->x, sizeof(double) * p->n);
+        //for(int i = 0; i < p->n+1; i+=1) {
+        //    x[i] = p->x[i];
+        //}
         // remove all nodes q in h with q.z < p.z
 
         struct Node *prev = (h);
@@ -665,7 +670,7 @@ bool branch(struct node_t *q, double z)
     }
     for (int h = 0; h < q->n; h += 1)
     {
-        if (!is_integer(&q->min[h]))
+        if (!is_integer(&q->x[h]))
         {
             if (q->min[h] == -INFINITY)
             {
