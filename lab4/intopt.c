@@ -91,14 +91,24 @@ void deleteStart(struct Node *head)
     free(temp);
 }
 
-struct node_t pop(struct Node *head)
-{
-    struct Node *temp = head;
+// struct node_t *pop(struct Node *head)
+// {
+//     struct node_t *pop = head->t;
+//     head->t = head->next->t;
+//     pop = head->t;
+//     free(head);
 
-    // move head to next node
-    head = (head)->next;
-    free(head);
-    return *(temp->t);
+//     return pop;
+// }
+
+struct node_t *pop(struct Node *head)
+{
+    struct node_t *pop = head->t;      //pop här som jag vill returnera  
+    struct Node *temp = head;
+    head = head->next;
+    free(temp);
+
+    return pop;
 }
 
 void insertStart(struct Node *head, struct node_t *data)
@@ -624,10 +634,9 @@ int is_integer(double *xp)
 
 int integer(struct node_t *p)
 {
-    int i;
-    for (i = 0; i < p->n; i++)
+    for (int i = 0; i < p->n; i++)
     {
-        if (!is_integer(&(p->x[i])))
+        if (!is_integer(&p->x[i]))
         {
             return 0;
         }
@@ -637,6 +646,9 @@ int integer(struct node_t *p)
 
 void bound(struct node_t *p, struct Node *h, double *zp, double *x)
 {
+    if (p == NULL)
+		return;
+
     if (p->z > *zp)
     {
         *zp = p->z;
@@ -649,7 +661,7 @@ void bound(struct node_t *p, struct Node *h, double *zp, double *x)
         //struct Node *q, *prev, *next;
         //CHeck head, if null -> return
 
-        if(h->t == NULL) {
+        if(h ->t == NULL) {
             return; //Tomt set
         }
         struct Node *q, *prev, *next;
@@ -771,20 +783,20 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
         free(p->max);
         free(p);
         free(h);
-        return z;
     }
     branch(p, z);
     while(h != NULL) {
-        *p = pop(h);
+        p = pop(h);
         succ(p, h, m, n, a, b, c, p->h, 1, floor(p->xh), &z, x); 
         succ(p, h, m, n, a, b, c, p->h, -1, -ceil(p->xh), &z, x); 
-        free(p);
+
+	    free(p);
     }
     if(z == -INFINITY) {
-        free(h);
+        //free(h);
         return NAN;
     } else {
-        free(h);
+        //free(h);
         return z;
     }
 }
