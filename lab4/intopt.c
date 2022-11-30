@@ -525,7 +525,7 @@ struct node_t* initial_node(int m, int n, double **a, double *b, double *c)
 
 struct node_t* extend(struct node_t *p, int m, int n, double **a, double *b, double *c, int k, double ak, double bk)
 {
-    struct node_t *q;
+    struct node_t *q = calloc(1, sizeof(struct node_t));
     int i, j;
     q->k = k;
     q->ak = ak;
@@ -534,29 +534,46 @@ struct node_t* extend(struct node_t *p, int m, int n, double **a, double *b, dou
         q->m = p->m;
     else if (ak < 0 && p->min[k] > 0)
     {
-        p->m = p->m;
+        q->m = p->m;
     }
     else
     {
-        p->m = p->m + 1;
+        q->m = p->m + 1;
     }
     q->n = p->n;
     q->h = -1;
     q->a = calloc(q->m + 1, sizeof(double *));
     for (int i = 0; i < q->m + 1; i++)
     {
-        p->a[i] = calloc(q->n + 1, sizeof(double));
+        q->a[i] = calloc(q->n + 1, sizeof(double));
     }
     q->b = calloc(q->m + 1, sizeof(double));
     q->c = calloc(q->n + 1, sizeof(double));
     q->x = calloc(q->n + 1, sizeof(double));
     q->min = calloc(n, sizeof(double));
     q->max = calloc(n, sizeof(double));
-    memcpy(q->min, p->min, sizeof(double*) * n);
-    memcpy(q->max, p->max, sizeof(double*) *n);
-    memcpy(q->a, &a, sizeof(double**) * m);
-    memcpy(q->b, &b, sizeof(double*) * m);
-    memcpy(q->c, &c, sizeof(double*) * (n + 1));
+    // memcpy(q->min, p->min, sizeof(double*) * n);
+    // memcpy(q->max, p->max, sizeof(double*) *n);
+    // memcpy(q->a, &a, sizeof(double**) * m);
+    // memcpy(q->b, &b, sizeof(double*) * m);
+    // memcpy(q->c, &c, sizeof(double*) * (n + 1));
+
+    for (i = 0; i < p->n; i++) {
+		q->min[i] = p->min[i];
+		q->max[i] = p->max[i];
+	}
+
+	for (i = 0; i < m; i += 1) {
+		for (int y = 0; y < n; y += 1) {
+			q->a[i][y] = a[i][y];
+		}
+		q->b[i] = b[i];
+	}
+
+	for (i = 0; i < n; i += 1) {
+		q->c[i] = c[i];
+	}
+
     if (ak > 0)
     {
         if (q->max[k] == INFINITY || bk < q->max[k])
