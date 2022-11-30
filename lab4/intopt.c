@@ -43,19 +43,19 @@ struct Node
     struct Node *next;
 };
 
-void deleteElem(struct Node **head, struct node_t *elem)
+void deleteElem(struct Node *head, struct node_t *elem)
 {
-    if (*head == NULL)
+    if (head == NULL)
     {
         return;
     }
-    else if ((*head)->t == elem)
+    else if ((head)->t == elem)
     {
-        *head = (*head)->next;
+        head = (head)->next;
         return;
     }
-    struct Node *prev = (*head)->next;
-    struct Node *temp = *head;
+    struct Node *prev = (head)->next;
+    struct Node *temp = head;
     while (temp != NULL)
     {
         if ((temp->t) == elem)
@@ -74,26 +74,37 @@ void deleteElem(struct Node **head, struct node_t *elem)
     return;
 }
 
-void deleteStart(struct Node **head)
+void deleteStart(struct Node *head)
 {
-    struct Node *temp = *head;
+    struct Node *temp = head;
 
     // If head is NULL it means Singly Linked List is empty
-    if (*head == NULL)
+    if (head == NULL)
     {
         printf("Impossible to delete from empty Singly Linked List");
         return;
     }
 
     // move head to next node
-    *head = (*head)->next;
-    printf("Deleted: %d\n", (temp->t)->m);
+    head = (head)->next;
     free(temp);
 }
 
-void insertStart(struct Node **head, struct node_t *data)
+struct node_t pop(struct Node *head)
 {
-    struct Node *temp = *head;
+    struct Node *temp = head;
+
+    // If head is NULL it means Singly Linked List is empty
+    if (head == NULL)
+
+    // move head to next node
+    head = (head)->next;
+    return *temp->t;
+}
+
+void insertStart(struct Node *head, struct node_t *data)
+{
+    struct Node *temp = head;
 
     while (temp != NULL)
     {
@@ -112,10 +123,10 @@ void insertStart(struct Node **head, struct node_t *data)
     newNode->t = data;
     // change the next node of this newNode
     // to current head of Linked List
-    newNode->next = *head;
+    newNode->next = head;
 
     // re-assign head to this newNode
-    *head = newNode;
+    head = newNode;
     printf("Inserted %d\n", (newNode->t)->m);
     free(newNode);
 }
@@ -604,7 +615,7 @@ int integer(struct node_t *p)
     return 1;
 }
 
-void bound(struct node_t *p, struct Node **h, double *zp, double *x)
+void bound(struct node_t *p, struct Node *h, double *zp, double *x)
 {
     if (&(p->z) > zp)
     {
@@ -612,8 +623,8 @@ void bound(struct node_t *p, struct Node **h, double *zp, double *x)
         memcpy(x, &(p->x), sizeof(int) *p->n);
         // remove all nodes q in h with q.z < p.z
 
-        struct Node *prev = (*h);
-        struct Node *temp = (*h)->next;
+        struct Node *prev = (h);
+        struct Node *temp = (h)->next;
         while (temp != NULL)
         {
             if ((temp->t->z) < p->z)
@@ -673,7 +684,7 @@ bool branch(struct node_t *q, double z)
 }
 
 
-void succ(struct node_t *p, struct Node **h, int m, int n, double **a, double *b, double *c, int k, double ak, double bk, double *zp, double *x)
+void succ(struct node_t *p, struct Node *h, int m, int n, double **a, double *b, double *c, int k, double ak, double bk, double *zp, double *x)
 {
     struct node_t *q = extend(p, m, n, a, b, c, k, ak, bk); 
     if(q == NULL)
@@ -698,8 +709,9 @@ void succ(struct node_t *p, struct Node **h, int m, int n, double **a, double *b
 double intopt(int m, int n, double **a, double *b, double *c, double *x)
 {
     struct node_t *p = initial_node(m, n, a, b, c);
-    struct Node **h = calloc(m, sizeof(struct node_t));     //behöver free()
-    insertStart(h, p);
+    struct Node *h = calloc(m, sizeof(struct node_t));     //behöver free()
+    //insertStart(h, p);
+    h->t = p;
     double z = -INFINITY;
     p->z = simplex(p->m, p->n, p->a, p->b, p->c, p->x, 0);
     if(integer(p) || !isfinite(p->z)) {
@@ -724,10 +736,10 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
     }
     branch(p, z);
     while(h != NULL) {
-        struct node_t *temp = (*h)->t;
-        succ(temp, h, m, n, a, b, c, temp->h, 1, floor(temp->xh), &z, x); 
-        succ(temp, h, m, n, a, b, c, temp->h, -1, -ceil(temp->xh), &z, x); 
-        free(temp);
+        *p = pop(h);
+        succ(p, h, m, n, a, b, c, p->h, 1, floor(p->xh), &z, x); 
+        succ(p, h, m, n, a, b, c, p->h, -1, -ceil(p->xh), &z, x); 
+        free(p);
     }
     if(z == -INFINITY) {
         free(h);
