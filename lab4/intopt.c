@@ -97,7 +97,8 @@ struct node_t pop(struct Node *head)
 
     // move head to next node
     head = (head)->next;
-    return *temp->t;
+    free(head);
+    return *(temp->t);
 }
 
 void insertStart(struct Node *head, struct node_t *data)
@@ -645,36 +646,33 @@ void bound(struct node_t *p, struct Node *h, double *zp, double *x)
         //}
         // remove all nodes q in h with q.z < p.z
 
+        //struct Node *q, *prev, *next;
+        //CHeck head, if null -> return
+
+        if(h->t == NULL) {
+            return; //Tomt set
+        }
         struct Node *q, *prev, *next;
-		if (h->t == NULL)
-			return;
+        //Hitta alla element som ska bort
+        q = h;
+        while(q->t->z < p->z) {
+            q = q->next;
+            if(q->t == NULL) {
+                return;
+            }
+        }
 
-		while (h->t->z < p->z)
-		{
-			q = h->next;
-			h = q->next;
-			//free_node_t(q->elem);
-			//free(q);
-			if (h->t == NULL)
-				return;
-		}
-
-		prev->t = h->t;
-		q = prev->next;
-		while (q != NULL)
-		{
-			next = q->next;
-			if (q->t->z < p->z)
-			{
-				prev->next = q->next;
-				// free_node_t(q->elem);
-				// free(q);
-			} else
-			{
-				prev = q;
-			}
-			q = next;
-		}
+        prev = q;
+        q = q->next;
+        while(q != NULL) {
+            next = q->next;
+            if(q->t->z < p->z) {
+                prev->next = q->next;
+            } else {
+                prev = q;
+            }
+            q = next;
+        }
     }
 }
 
@@ -711,7 +709,7 @@ bool branch(struct node_t *q, double z)
             free(q->b);
             free(q->c);
             free(q->x);
-
+            
             // matrix, have to free all of it
             // a is m big
             for (int i = 0; i < q->m; i++)
