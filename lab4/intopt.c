@@ -527,7 +527,6 @@ struct node_t* extend(struct node_t *p, int m, int n, double **a, double *b, dou
     q->ak = ak;
     q->bk = bk;
     //Den kraschar för k är för stort för lilla max[]
-    printf("MAX K BITCHES: %lf\n", p->max[k]);
     if (ak > 0 && p->max[k] < INFINITY){
         q->m = p->m;
     }
