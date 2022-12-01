@@ -77,7 +77,6 @@ void deleteElem(struct Node *head, struct node_t *elem)
 
 void deleteStart(struct Node *head)
 {
-    struct Node *temp = head;
 
     // If head is NULL it means Singly Linked List is empty
     if (head == NULL)
@@ -85,9 +84,9 @@ void deleteStart(struct Node *head)
         printf("Impossible to delete from empty Singly Linked List");
         return;
     }
-
+    struct Node *temp = head;
     // move head to next node
-    head = (head)->next;
+    head = head->next;
     free(temp);
 }
 
@@ -103,41 +102,29 @@ void deleteStart(struct Node *head)
 
 struct node_t *pop(struct Node *head)
 {
-    struct node_t *pop = head->t;      //pop här som jag vill returnera  
-    struct Node *temp = head;
-    head = head->next;
-    free(temp);
-
-    return pop;
+    struct Node *pop = head;
+    head = pop->next;
+    struct node_t *p = pop->t;
+    free(pop);
+    return p;
 }
 
 void insertStart(struct Node *head, struct node_t *data)
 {
-    struct Node *temp = head;
-
-    while (temp != NULL)
-    {
-        if ((temp->t) == data)
-        {
-            printf("Duplicate, can't add to Set");
-            return; // Duplicate, no put in plz
-        }
-        temp = temp->next;
-    }
 
     // dynamically create memory for this newNode
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    struct Node *newNode = (struct Node *)calloc(1,sizeof(struct Node));
 
     // assign data value
     newNode->t = data;
-    // change the next node of this newNode
-    // to current head of Linked List
-    newNode->next = head;
+
+    if(head != NULL) {
+        newNode->next = head;
+    }
 
     // re-assign head to this newNode
     head = newNode;
-    printf("Inserted %d\n", (newNode->t)->m);
-    free(newNode);
+
 }
 
 void display(struct Node *node)
@@ -539,7 +526,6 @@ struct node_t* extend(struct node_t *p, int m, int n, double **a, double *b, dou
     q->k = k;
     q->ak = ak;
     q->bk = bk;
-    glob += 1;
     //Den kraschar för k är för stort för lilla max[]
     printf("MAX K BITCHES: %lf\n", p->max[k]);
     if (ak > 0 && p->max[k] < INFINITY){
@@ -646,7 +632,7 @@ int integer(struct node_t *p)
 
 void bound(struct node_t *p, struct Node *h, double *zp, double *x)
 {
-    if (p == NULL)
+    if (p == NULL || h == NULL)
 		return;
 
     if (p->z > *zp)
@@ -661,7 +647,7 @@ void bound(struct node_t *p, struct Node *h, double *zp, double *x)
         //struct Node *q, *prev, *next;
         //CHeck head, if null -> return
 
-        if(h ->t == NULL) {
+        if(h->t == NULL) {
             return; //Tomt set
         }
         struct Node *q, *prev, *next;
@@ -785,7 +771,7 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
         free(h);
     }
     branch(p, z);
-    while(h != NULL) {
+    while(h->t != NULL) {
         p = pop(h);
         succ(p, h, m, n, a, b, c, p->h, 1, floor(p->xh), &z, x); 
         succ(p, h, m, n, a, b, c, p->h, -1, -ceil(p->xh), &z, x); 
