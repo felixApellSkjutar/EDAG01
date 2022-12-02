@@ -802,19 +802,19 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
         succ(p, &h, m, n, a, b, c, p->h, 1, floor(p->xh), &z, x);
         succ(p, &h, m, n, a, b, c, p->h, -1, -ceil(p->xh), &z, x);
 
-        //	    free(p);
+        	    free(p);
         // Testar att fria mer
-        for (int i = 0; i < m + 1; i++)
-        {
-            free(p->a[i]);
-        }
-        free(p->a);
-        free(p->b);
-        free(p->c);
-        free(p->x);
-        free(p->min);
-        free(p->max);
-        free(p);
+//        for (int i = 0; i < m + 1; i++)
+//        {
+//            free(p->a[i]);
+//        }
+//        free(p->a);
+//        free(p->b);
+//        free(p->c);
+//        free(p->x);
+//        free(p->min);
+//        free(p->max);
+//        free(p);
     }
     // free everything in the set.
 
