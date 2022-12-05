@@ -100,16 +100,16 @@ void deleteStart(struct Node *head)
 //     return pop;
 // }
 
-struct node_t *pop(struct Node *head)
+struct node_t *pop(struct Node **head)
 {
-    struct Node *pop = head;
-    head = pop->next;
+    struct Node *pop = *head;
+    *head = pop->next;
     struct node_t *p = pop->t;
     free(pop);
     return p;
 }
 
-void insertStart(struct Node *head, struct node_t *data)
+void insertStart(struct Node **head, struct node_t *data)
 {
 
     // dynamically create memory for this newNode
@@ -118,13 +118,13 @@ void insertStart(struct Node *head, struct node_t *data)
     // assign data value
     newNode->t = data;
 
-    if (head != NULL)
+    if (*head != NULL)
     {
-        newNode->next = head;
+        newNode->next = *head;
     }
 
     // re-assign head to this newNode
-    head = newNode;
+    *head = newNode;
 }
 
 void display(struct Node *node)
@@ -526,6 +526,7 @@ struct node_t *extend(struct node_t *p, int m, int n, double **a, double *b, dou
     q->k = k;
     q->ak = ak;
     q->bk = bk;
+    // Den kraschar för k är för stort för lilla max[]
     if (ak > 0 && p->max[k] < INFINITY)
     {
         q->m = p->m;
@@ -541,11 +542,11 @@ struct node_t *extend(struct node_t *p, int m, int n, double **a, double *b, dou
     q->n = p->n;
     q->h = -1;
     q->a = calloc(q->m + 1, sizeof(double *));
+    q->b = calloc(q->m + 1, sizeof(double));
     for (int i = 0; i < q->m + 1; i++)
     {
         q->a[i] = calloc(q->n + 1, sizeof(double));
     }
-    q->b = calloc(q->m + 1, sizeof(double));
     q->c = calloc(q->n + 1, sizeof(double));
     q->x = calloc(q->n + 1, sizeof(double));
     q->min = calloc(n, sizeof(double));
@@ -633,7 +634,7 @@ int integer(struct node_t *p)
     return 1;
 }
 
-void bound(struct node_t *p, struct Node *h, double *zp, double *x)
+void bound(struct node_t *p, struct Node **h, double *zp, double *x)
 {
     if (p == NULL || h == NULL)
         return;
@@ -650,21 +651,20 @@ void bound(struct node_t *p, struct Node *h, double *zp, double *x)
         // struct Node *q, *prev, *next;
         // CHeck head, if null -> return
 
-        if (h == NULL)
-        {
-            return; // Tomt set
-        }
-
-        if (h->t == NULL)
+        if (*h == NULL)
         {
             return; // Tomt set
         }
         struct Node *q, *prev, *next;
         // Hitta alla element som ska bort
-        q = h;
+        q = *h;
         while (q->t->z < p->z)
         {
             q = q->next;
+            if (q == NULL)
+            {
+                return;
+            }
             if (q->t == NULL)
             {
                 return;
@@ -719,29 +719,40 @@ bool branch(struct node_t *q, double z)
             q->xh = q->x[h];
             // delete each of a,b,c,x of q or recycle in other way
 
-            free(q->b);
-            free(q->c);
-            free(q->x);
+            //            free(q->b);
+            //            free(q->c);
+            //            free(q->x);
 
             // matrix, have to free all of it
             // a is m big
-            for (int i = 0; i < q->m; i++)
-            {
-                free(q->a[i]);
-            }
+            //            for (int i = 0; i < q->m; i++)
+            //            {
+            //                free(q->a[i]);
+            //            }
             return 1;
         }
     }
     return 0;
 }
 
-void succ(struct node_t *p, struct Node *h, int m, int n, double **a, double *b, double *c, int k, double ak, double bk, double *zp, double *x)
+void succ(struct node_t *p, struct Node **h, int m, int n, double **a, double *b, double *c, int k, double ak, double bk, double *zp, double *x)
 {
     struct node_t *q = extend(p, m, n, a, b, c, k, ak, bk);
-    if (q == NULL)
-    {
-        return;
-    }
+    // if (q == NULL)
+    // {
+        // //    for (int i = 0; i < q->m + 1; i++)
+        // //    {
+        // //        free(q->a[i]);
+        // //    }
+        // //    free(q->a);
+        // //    free(q->b);
+        // //    free(q->c);
+        // //    free(q->x);
+        // //    free(q->min);
+        // //    free(q->max);
+        // //    free(q);
+        // return;
+    // }
     q->z = simplex(q->m, q->n, q->a, q->b, q->c, q->x, 0);
     if (isfinite(q->z))
     {
@@ -752,15 +763,37 @@ void succ(struct node_t *p, struct Node *h, int m, int n, double **a, double *b,
         else if (branch(q, *zp))
         {
             insertStart(h, q);
+            // for (int i = 0; i < q->m + 1; i++)
+            // {
+            //     free(q->a[i]);
+            // }
+            // free(q->a);
+            // free(q->b);
+            // free(q->c);
+            // free(q->x);
+            // free(q->min);
+            // free(q->max);
+            //                    free(q);
             return;
         }
     }
+
+    for (int i = 0; i < q->m + 1; i++)
+    {
+        free(q->a[i]);
+    }
+    free(q->a);
+    free(q->b);
+    free(q->c);
+    free(q->x);
+    free(q->min);
+    free(q->max);
     free(q);
 }
 
 double intopt(int m, int n, double **a, double *b, double *c, double *x)
 {
-    struct node_t *p = initial_node(m, n, a, b, c);
+    struct node_t *p = initial_node(m, n, a, b, c);    // Detta frias inte
     struct Node *h = calloc(m, sizeof(struct node_t)); // behöver free()
     // insertStart(h, p);
     h->t = p;
@@ -774,7 +807,7 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
             memcpy(x, p->x, sizeof(double *) * p->n);
         }
 
-        for (int i = 0; i < m + 1; i++)
+        for (int i = 0; i < p->m + 1; i++)
         {
             free(p->a[i]);
         }
@@ -789,14 +822,27 @@ double intopt(int m, int n, double **a, double *b, double *c, double *x)
         return z;
     }
     branch(p, z);
-    while (h->t != NULL)
+    while (h != NULL)
     {
-        p = pop(h);
-        succ(p, h, m, n, a, b, c, p->h, 1, floor(p->xh), &z, x);
-        succ(p, h, m, n, a, b, c, p->h, -1, -ceil(p->xh), &z, x);
+        p = pop(&h);
+        succ(p, &h, m, n, a, b, c, p->h, 1, floor(p->xh), &z, x);
+        succ(p, &h, m, n, a, b, c, p->h, -1, -ceil(p->xh), &z, x);
 
+        // Testar att fria mer
+        for (int i = 0; i < p->m + 1; i++)
+        {
+            free(p->a[i]);
+        }
+        free(p->a);
+        free(p->b);
+        free(p->c);
+        free(p->x);
+        free(p->min);
+        free(p->max);
         free(p);
     }
+    // free everything in the set.
+
     if (z == -INFINITY)
     {
         // free(h);

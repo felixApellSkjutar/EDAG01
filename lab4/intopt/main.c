@@ -148,6 +148,7 @@ static void search(void)
 			check();
 		else if (isdigit(entry->d_name[0])) {
 			cd(entry->d_name);
+			printf("This is the file: %s\n", entry->d_name);
 			search();
 		}
 	}
