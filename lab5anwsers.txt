@@ -1,0 +1,30 @@
+lab 5
+For a.c
+
+
+första lfdx instruktion klar på klockcykel 49 på rad 13
+
+The last lfdx (floating point load instruction) is instruction nr 707, and there are 7 instructions per iteration, finshed on cycle nr 341
+
+There are about 3 clock cycles per iteration 
+
+For b.c:
+
+first lfdx is on row 17, cycle 51
+
+there are 7 instructions per iteration
+
+the last is instruction 704, and cycle 653, total about 6 cycles per iteration
+
+for intopt:
+
+fdiv (floating division) is stalling a lot, example instruction 200
+
+rename registers allows the processor to temporarily store instructions and operations while they are being procsessed. It essentially allows for executing instructions
+in a different order from the original program order. 
+
+Speculative execution is when the processor executes some instructions before knowing if it will actually need to or not, for example when branching the processor can guess 
+which branch will be jumped to and start executing instructions for that branch before it is sure that we will need those computations. This uses rename registers in order
+to save the values of our computations and can then use the values in those registers if it turns out they are needed. 
+
+for Speculative execution is is necessary to use rename registers while non-Speculative execution does not need but can still use rename registers.
