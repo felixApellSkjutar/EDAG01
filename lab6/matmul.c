@@ -14,10 +14,16 @@ void matmul()
 	size_t	i, j, k;
 
 	for (i = 0; i < N; i += 1) {
-		for (j = 0; j < N; j += 1) {
-			a[i][j] = 0;
-			for (k = 0; k < N; k += 1)
+		for (k = 0; k < N; k += 1) {
+			for (j = 0; j < N; j += 1) {
+				//We change the order of the loops
+				//now we go row-wise through all matrices
+				//Less cache-misses 'cuz we fetch one row and 
+				//then go through it
+				//we avoid fetching a new row each iteration
+				a[i][j] = 0;
 				a[i][j] += b[i][k] * c[k][j];
+			}
 		}
 	}
 }
